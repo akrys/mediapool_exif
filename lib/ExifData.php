@@ -97,13 +97,9 @@ class ExifData
 	/**
 	 * Formatierungsalgorithmus anstoßen
 	 * @param string|FormatterInterface $objectParam
-	 * @param Format $format
 	 * @return mixed
 	 */
-	public function format(
-		string|FormatterInterface $objectParam,
-		/** @deprecated since version 3.1 */ Format $format = Format::READABLE
-	): mixed {
+	public function format(string|FormatterInterface $objectParam): mixed {
 		try {
 			/** @var FormatterInterface $object */
 			$object = null;
@@ -117,10 +113,11 @@ class ExifData
 
 			if (is_string($objectParam)) {
 				$className = $objectParam;
-				if (!class_exists($objectParam)) {
-					//fallback, old call internal formatter without namespace
-					$className = '\\FriendsOfRedaxo\\MediapoolExif\\Format\\'.ucfirst($objectParam);
+				if(!class_exists($className)) {
+					//phpdoc warnings class_parents() with not existing class names
+					throw new InvalidClassException($className);
 				}
+				$object = new $className();
 			}
 
 //			print $className;
@@ -132,27 +129,7 @@ class ExifData
 //			]);
 //			print '</pre>';
 
-			if(!class_exists($className)) {
-				//phpdoc warnings class_parents() with not existing class names
-				throw new InvalidClassException($className);
-			}
-
-			// @codeCoverageIgnoreStart
-			// deprected
-			if (isset(class_parents($className)[FormatInterface::class])) {
-				return FormatInterface::get($this->exif, $className, $format)->format();
-			}
-			// @codeCoverageIgnoreEnd
-
-			// @codeCoverageIgnoreStart
-			// deprected
-			if (isset(class_parents($className)[FormatBase::class])) {
-				return FormatBase::get($this->exif, $className)->format();
-			}
-			// @codeCoverageIgnoreEnd
-
 			if (isset(class_implements($className)[FormatterInterface::class])) {
-				$object = new $className();
 				if (is_a($object, FormatterInterface::class)) {
 					return $object->format($this->exif);
 				}
