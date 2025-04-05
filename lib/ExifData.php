@@ -101,10 +101,10 @@ class ExifData
 	 */
 	public function format(string|FormatterInterface $objectParam): mixed {
 		try {
-			/** @var FormatterInterface $object */
+			/** @var FormatterInterface|null $object */
 			$object = null;
 			/** @var string $className */
-			$className = null;
+			$className = '';
 
 			if (is_object($objectParam)) {
 				$object = $objectParam;
