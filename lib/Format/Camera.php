@@ -5,6 +5,7 @@
  *
  * @author        akrys
  */
+
 namespace FriendsOfRedaxo\MediapoolExif\Format;
 
 use Exception;
@@ -29,7 +30,7 @@ class Camera extends FormatBase
 	 */
 	public function format(): array
 	{
-		$msg = "Deprecated class use \FriendsOfRedaxo\MediapoolExif\Formatter\Geo instead";
+		$msg = "Deprecated class use \FriendsOfRedaxo\MediapoolExif\Formatter\Camera instead";
 		user_error($msg, E_USER_DEPRECATED);
 
 		$formatter = new \FriendsOfRedaxo\MediapoolExif\Formatter\Camera();
