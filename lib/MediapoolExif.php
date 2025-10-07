@@ -60,8 +60,8 @@ final class MediapoolExif
 			$qry = "SELECT * FROM `".rex::getTablePrefix()."media` WHERE `filename` = '".$exp->getParam('filename')."'";
 			$sql = rex_sql::factory();
 			$sql->setQuery($qry);
-			if ($result = $sql->getArray()) {
-				$result = $result[0];
+			if ($rows = $sql->getArray()) {
+				$result = $rows[0];
 
 				$update = [];
 
@@ -86,13 +86,13 @@ final class MediapoolExif
 
 					if (in_array($key, array_keys($result))) {
 						if (preg_match('/date$/', $key)) {
-							$result[$key] = null;
+							unset($result[$key]);
 							$value = date('Y-m-d H:i:s', $value);
 						} elseif (is_array($value)) {
 							$value = join(', ', $value);
 						}
 
-						if (empty($result[$key]) && !empty($value)) {
+						if (isset($result[$key]) && !empty($value)) {
 							$update[$field] = "`$key` = ".$sql->escape($value);
 						}
 					}
@@ -122,7 +122,11 @@ final class MediapoolExif
 
 						rex_media_cache::delete($exp->getParam('filename'));
 					} else {
-						rex_logger::factory()->alert('SQL-Error ['.$sql->getErrno().'] '.$sql->getError());
+						$context = [
+							'errorNo' => $sql->getErrno(),
+							'error' => $sql->getError(),
+						];
+						rex_logger::factory()->alert('SQL-Error [{errorNo}] {error}', $context);
 					}
 					unset($qry);
 				}
